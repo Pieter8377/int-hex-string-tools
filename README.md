@@ -20,3 +20,10 @@ The trade-off is that all inputs and outputs are `BigInt` rather than `Number`. 
 ## Awkward edge
 
 The two functions that deal with signed values are not inverses of `toHex` and `fromHex`. `hexToSigned` reinterprets an unsigned bit pattern as signed two's complement, while `signedToHex` encodes a signed integer into that same bit pattern. If you call `hexToSigned(fromHex('ff'))` you get `255n`, not `-1n`, because `ff` does not set the sign bit of a 64-bit value. To see the signed interpretation of a full-width value you must supply all 16 hex digits, for example `hexToSigned(fromHex('ffffffffffffffff'))`, which returns `-1n`.
+
+## Design notes
+
+The window stores values eagerly rather than keeping running aggregates. Running
+sums drift with floating point over long streams, and recomputing from a small
+buffer is cheap enough that the drift is not worth the speed.
+
